@@ -1,26 +1,4 @@
 const reader = new FileReader()
-let highest_bonus = 0;
-let highest_payout = 0;
-let studies = [];
-let study_count = [];
-let selector = 0;
-let start = 67;
-let count = 0;
-let ignore_commas = false;
-let study_name = "";
-let study_pay = "";
-let study_bonus = "";
-let study_start = "";
-let study_finish = "";
-let study_code = "";
-let study_result = "";
-let studies_rejected = 0;
-let studies_timed_out = 0;
-let studies_returned = 0;
-let study_labels = [];
-let study_dataset = [];
-let loading_done = false;
-let yyyy = "", mm = "", dd = "";
 
 function read(input) {
 	const csv = input.files[0]
@@ -28,111 +6,64 @@ function read(input) {
 }
 
 reader.onload = function (e) {
+	let ignore_commas = false;
+	let container = [], studies = [], study_count = [], study_labels = [], study_dataset = [];
     let long_string = e.target.result;
+	let highest_bonus = 0, highest_payout = 0, studies_timed_out = 0,
+	 studies_returned = 0, studies_rejected = 0;
+	let selector = 0, start = 67, count = 0;
+
 	while(start != long_string.length){
-		if(long_string.charAt(start + count) == "\""){
-			// console.log("Found a double quote");
-			ignore_commas = !ignore_commas;
-		}
+		ignore_commas = check_for_double_quotes(ignore_commas, long_string, start, count);
+
 		if(long_string.charAt(start + count) == ',' && !ignore_commas){
-			// console.log('comma found');
-			if(selector == 5){
-				// console.log('Selector is 5...');
-				study_code = long_string.substr(start, count);
-				switch(long_string.charAt(start + count + 1)){
-					case 'A': 
-						study_result = 'APPROVED';
-						start = start + count + 11;
-						if(study_pay > highest_payout){
-							highest_payout = study_pay;
-						}
-						if(study_bonus > highest_bonus){
-							highest_bonus = study_bonus;
-						}
-						break;
-					case 'R':
-						if(long_string.charAt(start + count + 3) == 'J'){
-							study_result = 'REJECTED';
-							studies_rejected += 1;
-						} else {
-							study_result = 'RETURNED';
-							studies_returned += 1;
-						}
-						start = start + count + 11;
-						break;
-					case 'T':
-						study_result = 'TIMED-OUT';
-						start = start + count + 12;
-						studies_timed_out += 1;
-						break;
-					default:
-						break;
-				}
-				studies.push([study_name, study_pay, study_bonus, study_start, study_finish,
-				study_code, study_result]);
-				if(study_result = 'APPROVED'){
-					if(study_count.length == 0){
-						study_count.push([study_start, 1]);
-						// console.log(study_count[0][0]);
-						// console.log(study_count[0][1]);
-					} else {
-						// console.log("starting for loop for study start checks");
-						let found = false;
-						for (i = 0 ; i < study_count.length ; i++){
-							if( study_count[i][0].toDateString() == study_start.toDateString()){
-								// console.log("Found a match, incrementing");
-								study_count[i][1] += 1;
-								found = true;
-							}
-						}
-						if(found == false){
-							// console.log("No match, pushing to array");
-							study_count.push([study_start, 1]);
-						}
-						// console.log(found);
+			switch(selector){
+				case 0: 
+					container[0] = long_string.substr(start, count);
+					break;
+				case 1:
+					container[1] = long_string.substr(start, count);
+					container[1] = container[1].substr(1, container[1].length - 1);
+					container[1] = +container[1].trim() * 100;
+					break;
+				case 2:
+					container[2] = long_string.substr(start, count);
+					container[2] = container[2].substr(1, container[2].length - 1);
+					container[2] = +container[2] * 100;
+					break;
+				case 3:
+					container[3] = long_string.substr(start, count);
+					container[3] = container[3].substr(0, 10);
+					container[3] = new Date(container[3]);
+					break;
+				case 4:
+					container[4] = long_string.substr(start, count);
+					break;
+				case 5:
+					container[5] = long_string.substr(start, count);
+					container[6] = get_study_result(start + count + 1, long_string);
+					start = get_start(container[6], start, count);
+				
+					if(container[6] = 'APPROVED'){
+						highest_payout = check_for_highest_payout(highest_payout, container);
+						highest_bonus = check_for_highest_bonus(highest_bonus, container);
+						study_count = update_study_count(study_count, container);
+					
 					}
-				}
-				// console.log('console logging array contents...');
-				// count = studies.length - 1;
-				// console.log(studies[count]);
-				count = 0;
-				selector = 0;
-			} else {
-				switch(selector){
-					case 0:
-						study_name = long_string.substr(start, count);
-						break;
-					case 1:
-						study_pay = long_string.substr(start, count);
-						study_pay = study_pay.substr(1, study_pay.length - 1);
-						study_pay = +study_pay.trim() * 100;
-						break;
-					case 2:
-						study_bonus = long_string.substr(start, count);
-						study_bonus = study_bonus.substr(1, study_bonus.length - 1);
-						study_bonus = +study_bonus * 100;
-						break;
-					case 3:
-						study_start = long_string.substr(start, count);
-						study_start = study_start.substr(0, 10);
-						study_start = new Date(study_start);
-						//let yyyy = study_start.substr(0, 4);
-						//let mm = study_start.substr(5, 2);
-						//let dd = study_start.substr(8, 2);
-						//study_start = new Date(yyyy, mm, dd);
-						break;
-					case 4:
-						study_finish = long_string.substr(start, count);
-						break;
-					default:
-						break;
-				}
+
+					studies.push(container);
+					count = 0, selector = 0, container = [];
+					break;
+				default:
+					alert('Something has gone wrong with the selector');
+					break;
+
+			}
 				selector += 1;
 				start = start + count + 1;
 				count = 0;
-			}
 		} else {
-			count +=1;
+			count +=1; // move forward a character
 		}
 	}
 	document.querySelector('.output').innerText = `Highest ever payout = ${highest_payout / 100},
@@ -140,7 +71,6 @@ reader.onload = function (e) {
 	 Studies returned = ${studies_returned},
 	 Studies rejected by researcher = ${studies_rejected},
 	 Studies timed out of = ${studies_timed_out}`;
-	 console.log(study_count);
 	 console.log(studies);
 	 study_count.sort(function(a,b){
 	 return a[0] - b[0];
@@ -150,26 +80,86 @@ reader.onload = function (e) {
 		study_dataset.push(study_count[i][1]);
 
 	}
-	console.log(study_labels);
-	console.log(study_dataset);
-	load_graph();
+	load_graph(study_labels, study_dataset);
 }
 
-/* 67 is the index of the first character of the first study
-ideas for making it work - check string char by char for a comma, 
-incrementing a counter as we go, once a comma is found get the substr
-of the previous index (should be right after last comma) and the counter
-to successfully take the value from line, then repeat 
-0-name
-1-pay
-2-bonus
-3-date start
-4-date end
-5-code
-6-result
-after getting code, check first char of approve/reject/time out for easy count increment
-*/
+function check_for_double_quotes(bool, str, start, count){
+	if(str.charAt(start + count) == "\""){
+		bool = !bool;
+	}
+	return bool;
+}
 
-// debug thingies
-// put this somewhere to know state of variables
-// console.log(`Selector: ${selector}, start: ${start});
+function check_for_highest_payout(payout, container){
+	if(container[1] > payout){
+		payout = container[1];
+	}
+	return payout;
+}
+
+function check_for_highest_bonus(bonus, container){
+	if(container[1] > bonus){
+		bonus = container[2];
+	}
+	return bonus;
+}
+
+function update_study_count(study_count, container){
+	if(study_count.length == 0){
+		study_count.push([container[3], 1]);
+	} else {
+		let found = false;
+		for (i = 0 ; i < study_count.length ; i++){
+			if( study_count[i][0].toDateString() == container[3].toDateString()){
+				study_count[i][1] += 1;
+				found = true;
+			}
+		}
+		if(found == false){
+			study_count.push([container[3], 1]);
+		}
+	}
+	return study_count;
+}
+
+function get_study_result(pos, long_string){
+	console.log(long_string.charAt(pos));
+	console.log(long_string.substr(pos));
+	switch(long_string.charAt(pos)){
+		case 'A': 
+			return 'APPROVED';
+			break;
+		case 'R':
+			if(long_string.charAt(pos + 3) == 'J'){
+				return 'REJECTED';
+				// studies_rejected += 1;
+			} else {
+				return 'RETURNED';
+				// studies_returned += 1;
+			}
+			break;
+		case 'T':
+			return 'TIMED-OUT';
+			// studies_timed_out += 1;
+			break;
+		default:
+			return 'UNKNOWN';
+			break;
+	}
+}
+
+function get_start(string, start, count){
+	switch(string){
+		case 'APPROVED':
+		case 'REJECTED':
+		case 'RETURNED':
+			return start + count + 11;
+			break;
+		case 'TIMED-OUT':
+			return start + count + 12;
+			break;
+		default:
+			alert('Error, result is not as expected');
+			return null;
+	}
+}

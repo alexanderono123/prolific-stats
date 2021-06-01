@@ -15,15 +15,15 @@
         <canvas id="myChart"></canvas>
     </div>
         <script>
-            function load_graph(){
+            function load_graph(labels, dataset){
                 let myChart = document.getElementById("myChart").getContext('2d');
                 let studies_chart = new Chart(myChart, {
                     type:'line',
                     data:{
-                        labels:study_labels,
+                        labels:labels,
                         datasets:[{
                             label:'Studies completed',
-                            data:study_dataset
+                            data:dataset
                         }],
                     },
                     options:{}
