@@ -9,7 +9,7 @@ reader.onload = function (e) {
 	let ignore_commas = false;
 	let container = [], studies = [], study_count = [], study_labels = [], study_dataset = [];
 	let highest_bonus = 0, highest_payout = 0, studies_timed_out = 0,
-	 studies_returned = 0, studies_rejected = 0;
+	 studies_returned = 0, studies_rejected = 0, studies_approved = 0;
 	let selector = 0, start = 67, count = 0;
     let long_string = e.target.result;
 
@@ -46,6 +46,7 @@ reader.onload = function (e) {
 							start = start + count + 11;
 							highest_payout = check_for_highest_payout(highest_payout, container[1]);
 							highest_bonus = check_for_highest_bonus(highest_bonus, container[2]);
+							studies_approved += 1;
 							break;
 						case 'R':
 							if(long_string.charAt(start + count + 3) == 'J'){
@@ -89,11 +90,12 @@ reader.onload = function (e) {
 			count +=1;
 		}
 	}
-	document.querySelector('.output').innerText = `Highest ever payout = ${highest_payout / 100}
-	 Highest ever bonus = ${highest_bonus / 100}
-	 Studies returned = ${studies_returned}
-	 Studies rejected by researcher = ${studies_rejected}
-	 Studies timed out of = ${studies_timed_out}`;
+	document.querySelector('#output').innerText = `Studies approved: ${studies_approved}
+	Studies returned: ${studies_returned}
+	Studies rejected by researcher: ${studies_rejected}
+	Studies timed out of: ${studies_timed_out}
+	Highest ever payout: £${highest_payout / 100}
+	Highest ever bonus: £${highest_bonus / 100}`;
 
 	 console.log(study_count);
 	 console.log(studies);
@@ -110,6 +112,8 @@ reader.onload = function (e) {
 	console.log(study_labels);
 	console.log(study_dataset);
 	load_graph(study_labels, study_dataset);
+	let button = document.getElementById('helper_button');
+	button.style.visibility = "hidden";
 }
 
 function check_for_double_quotes(bool, str, start, count){
@@ -149,4 +153,10 @@ function update_study_count(study_count, container){
 		}
 	}
 	return study_count;
+}
+
+function toggleHelper(){
+	let node = document.getElementById('helper');
+	let visibility = node.style.visibility;
+	node.style.visibility = visibility == "visible" ? 'hidden' : "visible";
 }

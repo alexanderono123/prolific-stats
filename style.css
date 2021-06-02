@@ -1,7 +1,5 @@
 body{
     font-family: Arial, Helvetica, sans-serif;
-    border: 3px solid green;
-    min-width:800px;
 }
 
 header{
@@ -12,7 +10,7 @@ header{
 input{
     display:block;
     margin:auto;
-    width:50%;
+    width:15%;
 }
 
 div{
@@ -20,6 +18,21 @@ div{
     margin:auto;
 }
 
-.output{
+#output{
+    padding:10px 0 10px 0;
     text-align:center;
+}
+
+button {
+    display:block;
+    margin:auto;
+}
+
+#helper{
+    text-align:center;
+    visibility:hidden;
+}
+
+#helper_button{
+    visibility:visible;
 }
