@@ -13,7 +13,7 @@
 <body>
     <header>
         <h1>Prolific stats viewer</h1>
-        <p>Check out your stats by uploading your full submission history below</p>
+        <p>Check out your stats by uploading your full submission history .csv file</p>
     </header>
     <input type="file" onchange=read(this)>
     <div>
@@ -35,6 +35,8 @@
                 });
             }
         </script>
-    <div class="output"></div>
+    <div id="output"></div>
+    <button id="helper_button" onclick="toggleHelper()">Where do I get my submission history?</button>
+    <p id="helper">Go to your submissions on Prolific.co, scroll to the bottom and click the button to download the file.</p>
 </body>
 </html>
