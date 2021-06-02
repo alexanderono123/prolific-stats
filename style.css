@@ -1,0 +1,25 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    border: 3px solid green;
+    min-width:800px;
+}
+
+header{
+    text-align:center;
+    padding-bottom: 10px;
+}
+
+input{
+    display:block;
+    margin:auto;
+    width:50%;
+}
+
+div{
+    width:1000px;
+    margin:auto;
+}
+
+.output{
+    text-align:center;
+}

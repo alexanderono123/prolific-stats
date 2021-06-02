@@ -1,6 +1,3 @@
-// TODO - continue to refactor and make code more modular, in particular switch(selector) cases
-// Maybe also solve the way the selector and count is set at the end of that switch
-
 const reader = new FileReader()
 
 function read(input) {
@@ -47,16 +44,8 @@ reader.onload = function (e) {
 						case 'A': 
 							container[6] = 'APPROVED';
 							start = start + count + 11;
-
 							highest_payout = check_for_highest_payout(highest_payout, container[1]);
-							//if(container[1] > highest_payout){
-							//	highest_payout = container[1];
-							//}
-
 							highest_bonus = check_for_highest_bonus(highest_bonus, container[2]);
-							//if(container[2] > highest_bonus){
-							//	highest_bonus = container[2];
-							//}
 							break;
 						case 'R':
 							if(long_string.charAt(start + count + 3) == 'J'){
@@ -100,10 +89,10 @@ reader.onload = function (e) {
 			count +=1;
 		}
 	}
-	document.querySelector('.output').innerText = `Highest ever payout = ${highest_payout / 100},
-	 Highest ever bonus = ${highest_bonus / 100},
-	 Studies returned = ${studies_returned},
-	 Studies rejected by researcher = ${studies_rejected},
+	document.querySelector('.output').innerText = `Highest ever payout = ${highest_payout / 100}
+	 Highest ever bonus = ${highest_bonus / 100}
+	 Studies returned = ${studies_returned}
+	 Studies rejected by researcher = ${studies_rejected}
 	 Studies timed out of = ${studies_timed_out}`;
 
 	 console.log(study_count);
@@ -161,35 +150,3 @@ function update_study_count(study_count, container){
 	}
 	return study_count;
 }
-
-/* it works
-switch(long_string.charAt(start + count + 1)){
-					case 'A': 
-						container[6] = 'APPROVED';
-						start = start + count + 11;
-						if(container[1] > highest_payout){
-							highest_payout = container[1];
-						}
-						if(container[2] > highest_bonus){
-							highest_bonus = container[2];
-						}
-						break;
-					case 'R':
-						if(long_string.charAt(start + count + 3) == 'J'){
-							container[6] = 'REJECTED';
-							studies_rejected += 1;
-						} else {
-							container[6] = 'RETURNED';
-							studies_returned += 1;
-						}
-						start = start + count + 11;
-						break;
-					case 'T':
-						container[6] = 'TIMED-OUT';
-						start = start + count + 12;
-						studies_timed_out += 1;
-						break;
-					default:
-						break;
-				}
-				*/
