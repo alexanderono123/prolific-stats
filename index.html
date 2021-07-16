@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <h1>Prolific stats viewer</h1>
@@ -18,24 +20,26 @@
     <div>
         <canvas id="myChart"></canvas>
     </div>
-        <script>
-            function load_graph(labels, dataset){
-                let myChart = document.getElementById("myChart").getContext('2d');
-                let studies_chart = new Chart(myChart, {
-                    type:'line',
-                    data:{
-                        labels:labels,
-                        datasets:[{
-                            label:'Studies completed',
-                            data:dataset
-                        }],
-                    },
-                    options:{}
-                });
-            }
-        </script>
+    <script>
+        function load_graph(labels, dataset) {
+            let myChart = document.getElementById("myChart").getContext('2d');
+            let studies_chart = new Chart(myChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Studies completed',
+                        data: dataset
+                    }],
+                },
+                options: {}
+            });
+        }
+    </script>
     <div id="output"></div>
     <button id="helper_button" onclick="toggleHelper()">Where do I get my submission history?</button>
-    <p id="helper">Go to your submissions on Prolific.co, scroll to the bottom and click the button to download the file.</p>
+    <p id="helper">Go to your submissions on Prolific.co, scroll to the bottom and click the button to download the
+        file.</p>
 </body>
+
 </html>
