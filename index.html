@@ -13,17 +13,80 @@
 
 <body>
     <header>
-        <h1>Prolific stats viewer</h1>
+        <a href="https://prolific.co/">
+            <h1 style="color:#1C498A">Prolific.co</h1>
+        </a>
+        <h1>stat viewer</h1>
         <p>Check out your stats by uploading your full submission history .csv file</p>
     </header>
+
     <input type="file" onchange=read(this)>
-    <div>
-        <canvas id="myChart"></canvas>
+
+    <div class="container">
+        <h1>Studies completed per day</h1>
+
+        <canvas class="myChart"></canvas>
+
+        <div class="checker">
+
+            <label for="month">Check by year/month:</label>
+
+            <select name="month" id="month_selector">
+                <option value="0">Full year</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <select name="year" id="year_selector">
+            </select>
+
+            <button onclick="check()">Check!</button>
+        </div>
+
+        <!-- TODO 
+            Add amount of studies completed in selected period and amount earned for selected period
+            here as a number you can see
+        -->
+
+        <br>
+        <hr>
+
+        <div class="flexbox">
+            <div class="additional">
+                <h1>Studies by type</h1>
+                <canvas class="myPie"></canvas>
+            </div>
+
+            <div class="bar">
+                <h1>Highest payout & bonus</h1>
+                <canvas class="myBar"></canvas>
+            </div>
+        </div>
     </div>
+
+
+    <button class="toggle_helper" onclick="toggle_helper()">Where do I get my submission history?</button>
+    <p class="helper">Go to your submissions on Prolific.co, scroll to the bottom and click the button to download the
+        file.</p>
+    <br>
+
     <script>
+        let studies_chart = 0;
+
         function load_graph(labels, dataset) {
-            let myChart = document.getElementById("myChart").getContext('2d');
-            let studies_chart = new Chart(myChart, {
+            let myChart = document.getElementsByClassName("myChart");
+            let ctx = myChart[0].getContext('2d');
+            studies_chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -35,11 +98,75 @@
                 options: {}
             });
         }
+
+        function load_new_graph(labels, dataset) {
+            if (studies_chart instanceof Chart) {
+                studies_chart.destroy();
+            }
+            let myChart = document.getElementsByClassName("myChart");
+            let ctx = myChart[0].getContext('2d');
+            studies_chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Studies completed',
+                        data: dataset
+                    }],
+                },
+                options: {}
+            });
+        }
+
+        function load_pie(dataset) {
+            let myPie = document.getElementsByClassName("myPie");
+            let ctx = myPie[0].getContext('2d');
+            let studies_pie = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Studies approved', 'Studies returned', 'Studies rejected by researcher',
+                        'Studies timed out of'],
+                    datasets: [{
+                        label: 'Extra stats',
+                        data: dataset,
+                        backgroundColor: [
+                            'rgb(48, 252, 3)',
+                            'rgb(236, 252, 3)',
+                            'rgb(255, 3, 3)',
+                            'rgb(11, 3, 252)'
+                        ]
+                    }]
+                }
+            });
+        }
+
+        function load_bar(dataset) {
+            let myBar = document.getElementsByClassName("myBar");
+            let ctx = myBar[0].getContext('2d');
+            let studies_bar = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Highest ever payout', 'Highest ever bonus'],
+                    datasets: [{
+                        label: '£ GBP',
+                        data: dataset,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)'
+                        ],
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
     </script>
-    <div id="output"></div>
-    <button id="helper_button" onclick="toggleHelper()">Where do I get my submission history?</button>
-    <p id="helper">Go to your submissions on Prolific.co, scroll to the bottom and click the button to download the
-        file.</p>
+
+
 </body>
 
 </html>
