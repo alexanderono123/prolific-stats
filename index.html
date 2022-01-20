@@ -23,40 +23,39 @@
     <input type="file" onchange=read(this)>
 
     <div class="container">
+        <hr>
         <h1>Studies completed per day</h1>
 
         <canvas class="myChart"></canvas>
+        <div class="flex_wrapper">
+            <div class="checker">
 
-        <div class="checker">
+                <label for="month">Check by year/month:</label>
 
-            <label for="month">Check by year/month:</label>
+                <select name="month" id="month_selector">
+                    <option value="0">Full year</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
 
-            <select name="month" id="month_selector">
-                <option value="0">Full year</option>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
+                <select name="year" id="year_selector">
+                </select>
 
-            <select name="year" id="year_selector">
-            </select>
+                <button onclick="check()">Check!</button>
+            </div>
 
-            <button onclick="check()">Check!</button>
+            <div class="pay_and_count"></div>
         </div>
-
-        <!-- TODO 
-            Add amount of studies completed in selected period and amount earned for selected period
-            here as a number you can see
-        -->
 
         <br>
         <hr>

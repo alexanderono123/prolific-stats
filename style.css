@@ -29,8 +29,13 @@ input{
     margin:auto;
 }
 
+.flex_wrapper{
+    display:flex;
+    flex-direction:row;
+    justify-content: space-between;
+}
+
 .checker{
-    padding: 0 30% 0 30%;
     display:flex;
     flex-direction: row;
     justify-content: center;
@@ -40,17 +45,17 @@ input{
     float:right;
 }
 
+.pay_and_count {
+    float:right;
+    font-size:1.5em;
+}
+
 label{
     font-size:2em;
 }
 
 canvas{
     display:none;
-}
-
-#output{
-    padding:10px 0 10px 0;
-    text-align:center;
 }
 
 button {
