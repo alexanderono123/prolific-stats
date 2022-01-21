@@ -83,22 +83,6 @@
         let studies_chart = 0;
 
         function load_graph(labels, dataset) {
-            let myChart = document.getElementsByClassName("myChart");
-            let ctx = myChart[0].getContext('2d');
-            studies_chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Studies completed',
-                        data: dataset
-                    }],
-                },
-                options: {}
-            });
-        }
-
-        function load_new_graph(labels, dataset) {
             if (studies_chart instanceof Chart) {
                 studies_chart.destroy();
             }

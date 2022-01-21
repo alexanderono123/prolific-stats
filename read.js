@@ -32,8 +32,9 @@ reader.onload = function (e) {
 					// study pay
 					container[1] = long_string.substr(start, count);
 					container[1] = container[1].substr(1, container[1].length - 1);
-					container[1] = +container[1].trim() * 100;
-					console.log(container[1]);
+					//container[1] = Math.trunc(+container[1].trim() * 100);
+					container[1] = +container[1].trim();
+					//console.log(container[1]);
 					// todo - possibly record the total amount of payout for studies in a month,
 					// append it to the start/end of the year and months array
 					break;
@@ -41,7 +42,10 @@ reader.onload = function (e) {
 					// study bonus
 					container[2] = long_string.substr(start, count);
 					container[2] = container[2].substr(1, container[2].length - 1);
-					container[2] = +container[2] * 100;
+					//console.log("string is: " + container[2]);
+					//container[2] = Math.trunc(+container[2].trim() * 100);
+					container[2] = +container[2].trim();
+					//console.log("int is: " + container[2]);
 					break;
 				case 3:
 					// study start date
@@ -110,56 +114,63 @@ reader.onload = function (e) {
 		}
 	}
 
-	pie_dataset = [studies_approved, studies_returned, studies_rejected, studies_timed_out];
-	bar_dataset = [highest_payout / 100, highest_bonus / 100];
+	// sort all the month arrays in descending order so the data is shown in order
 
 	let temp_month = [];
 	let temp_month_num = 0;
 	let temp_month_pay = 0;
+	let temp_month_bonus = 0;
 
-	// sort all the month arrays in descending order so the data is shown in order
 	for (i = 0; i < studies.length; i++) {
 		for (j = 1; j < studies[i].length; j++) {
 			temp_month = studies[i][j];
 			temp_month_num = temp_month.shift();
 			temp_month_pay = temp_month.shift();
+			temp_month_bonus = temp_month.shift();
 			temp_month.sort((a, b) => {
 				return a[0] - b[0];
 			});
+			temp_month.unshift(temp_month_bonus);
 			temp_month.unshift(temp_month_pay);
 			temp_month.unshift(temp_month_num);
 			studies[i][j] = temp_month;
 		}
 	}
 
-	console.log(studies);
+	// for debugging
+	// console.log(studies);
 
-	let tyear = 0;
-	let tmonth = 0;
-	let tday = 0;
+	// create options for the HTML select element
 	let study_day_count = 0;
 	let option = null;
 
 	for (i = 0; i < studies.length; i++) {
-		tyear = studies[i][0];
 		option = document.createElement("option");
-		option.text = tyear;
-		option.value = "" + tyear;
+		option.text = studies[i][0];
+		option.value = "" + studies[i][0];
 		document.getElementById("year_selector").append(option);
 		for (j = 1; j < studies[i].length; j++) {
-			tmonth = studies[i][j][0]
-			for (k = 2; k < studies[i][j].length; k++) {
-				tday = studies[i][j][k][0];
+			for (k = 3; k < studies[i][j].length; k++) {
 				study_day_count = studies[i][j][k][1];
-				study_labels.push(tyear + "-" + tmonth + "-" + tday);
+				study_labels.push(studies[i][0] + "-" + studies[i][j][0] + "-" + studies[i][j][k][0]);
 				study_dataset.push(study_day_count);
 			}
 		}
 	}
 
-	//load_graph(study_labels, study_dataset);
+	// load the graph fully
 	reloadGraph(0, 0, 1);
-	toggle_toggle_helper();
+
+	// display stats and remove helper button
+	let node = document.getElementsByClassName('toggle_helper');
+	node[0].style.visibility = 'hidden';
+	node = document.getElementsByClassName('container');
+	node[0].style.display = 'block';
+
+
+	pie_dataset = [studies_approved, studies_returned, studies_rejected, studies_timed_out];
+	bar_dataset = [highest_payout / 100, highest_bonus / 100];
+
 	load_pie(pie_dataset);
 	load_bar(bar_dataset);
 }
@@ -191,7 +202,7 @@ function update_studies(studies, container, year, month, day) {
 		// if it's the first study, create the first year array, populate it with months
 		// then increment the day of the study. otherwise check the array for a match
 
-		studies.push([year, [01, 0], [02, 0], [03, 0], [04, 0], [05, 0], [06, 0], [07, 0], [08, 0], [09, 0], [10, 0], [11, 0], [12, 0]]);
+		studies.push([year, [01, 0, 0], [02, 0, 0], [03, 0, 0], [04, 0, 0], [05, 0, 0], [06, 0, 0], [07, 0, 0], [08, 0, 0], [09, 0, 0], [10, 0, 0], [11, 0, 0], [12, 0, 0]]);
 
 		for (i = 1; i < studies[0].length; i++) {
 			if (studies[0][i][0] == month) {
@@ -212,23 +223,25 @@ function update_studies(studies, container, year, month, day) {
 					//console.log("entering month check loop");
 					if (studies[i][j][0] == month) {
 						// if month is a match, check the day
-						for (k = 2; k < studies[i][j].length; k++) {
+						for (k = 3; k < studies[i][j].length; k++) {
 							if (studies[i][j][k][0] == day) {
 								day_match = true;
 								studies[i][j][k][1] = studies[i][j][k][1] + 1;
 								studies[i][j][1] = studies[i][j][1] + container[1];
+								studies[i][j][2] = studies[i][j][2] + container[2];
 							}
 						}
 						if (!day_match) {
 							studies[i][j].push([day, 1]);
 							studies[i][j][1] = studies[i][j][1] + container[1];
+							studies[i][j][2] = studies[i][j][2] + container[2];
 						}
 					} // no need to push a new month because they're all already there
 				}
 			}
 		}
 		if (!year_match) {
-			studies.push([year, [01, 0], [02, 0], [03, 0], [04, 0], [05, 0], [06, 0], [07, 0], [08, 0], [09, 0], [10, 0], [11, 0], [12, 0]]);
+			studies.push([year, [01, 0, 0], [02, 0, 0], [03, 0, 0], [04, 0, 0], [05, 0, 0], [06, 0, 0], [07, 0, 0], [08, 0, 0], [09, 0, 0], [10, 0, 0], [11, 0, 0], [12, 0, 0]]);
 
 			for (i = 1; i < studies.length; i++) {
 				if (studies[i][0] == year) {
@@ -236,6 +249,7 @@ function update_studies(studies, container, year, month, day) {
 						if (studies[i][j][0] == month) {
 							studies[i][j].push([day, 1]);
 							studies[i][j][1] = studies[i][j][1] + container[1];
+							studies[i][j][2] = studies[i][j][2] + container[2];
 						}
 					}
 				}
@@ -251,13 +265,6 @@ function toggle_helper() {
 	node[0].style.visibility = visibility == "visible" ? 'hidden' : "visible";
 }
 
-function toggle_toggle_helper() {
-	let node = document.getElementsByClassName('toggle_helper');
-	node[0].style.visibility = 'hidden';
-	node = document.getElementsByClassName('container');
-	node[0].style.display = 'block';
-}
-
 function reloadGraph(year, month, full) {
 	// load a new labels and dataset array, then load a graph of them
 	let div = document.getElementsByClassName("pay_and_count");
@@ -265,9 +272,8 @@ function reloadGraph(year, month, full) {
 	study_labels = [];
 	study_dataset = [];
 	let pay = 0;
+	let bonus = 0;
 	let count = 0;
-	let temp_month = month;
-	let temp_year = year;
 
 	if (year) {
 		console.log("year flag is true, year is " + year);
@@ -279,7 +285,8 @@ function reloadGraph(year, month, full) {
 						if (studies[i][j][0] == month) {
 							console.log("matched month. " + studies[i][j][0] + " and " + month);
 							pay = studies[i][j][1];
-							for (k = 2; k < studies[i][j].length; k++) {
+							bonus = studies[i][j][2];
+							for (k = 3; k < studies[i][j].length; k++) {
 								study_labels.push(year + "-" + month + "-" + studies[i][j][k][0]);
 								study_dataset.push(studies[i][j][k][1]);
 								count = count + studies[i][j][k][1];
@@ -292,7 +299,8 @@ function reloadGraph(year, month, full) {
 					for (j = 1; j < studies[i].length; j++) {
 						//month = studies[i][j][0];
 						pay = pay + studies[i][j][1];
-						for (k = 2; k < studies[i][j].length; k++) {
+						bonus = bonus + studies[i][j][2];
+						for (k = 3; k < studies[i][j].length; k++) {
 							study_labels.push(year + "-" + studies[i][j][0] + "-" + studies[i][j][k][0]);
 							study_dataset.push(studies[i][j][k][1]);
 							count = count + studies[i][j][k][1];
@@ -304,11 +312,10 @@ function reloadGraph(year, month, full) {
 	} else if (full) {
 		console.log("full flag true, getting all studies from all years");
 		for (i = 0; i < studies.length; i++) {
-			//year = studies[i][0];
 			for (j = 1; j < studies[i].length; j++) {
-				//month = studies[i][j][0];
 				pay = pay + studies[i][j][1];
-				for (k = 2; k < studies[i][j].length; k++) {
+				bonus = bonus + studies[i][j][2];
+				for (k = 3; k < studies[i][j].length; k++) {
 					study_labels.push(studies[i][0] + "-" + studies[i][j][0] + "-" + studies[i][j][k][0]);
 					study_dataset.push(studies[i][j][k][1]);
 					count = count + studies[i][j][k][1];
@@ -317,11 +324,12 @@ function reloadGraph(year, month, full) {
 		}
 	}
 
-	console.log(study_labels);
-	console.log(study_dataset);
-	load_new_graph(study_labels, study_dataset);
-	console.log("pay is " + pay + " and count is " + count);
-	pay = pay / 100;
+	load_graph(study_labels, study_dataset);
+
+	pay = +pay.toFixed(2);
+	bonus = +bonus.toFixed(2);
+
+	let total = (pay + bonus).toFixed(2);
 
 	console.log("month: " + month + ", year: " + year + ", full : " + full);
 	if (month && year) {
@@ -367,25 +375,26 @@ function reloadGraph(year, month, full) {
 				break;
 		}
 		if (count == 1) {
-			div[0].append(`In ${month} ${year}, you completed ${count} study and earned £${pay}`);
+			div[0].append(`In ${month} ${year}, you completed ${count} study and earned £${total}, of which £${bonus} was bonus payment.`);
 		} else {
-			div[0].append(`In ${month} ${year}, you completed ${count} studies and earned £${pay}`);
+			div[0].append(`In ${month} ${year}, you completed ${count} studies and earned £${total}, of which £${bonus} was bonus payment.`);
 		}
 	} else if (year && !month) {
 		if (count == 1) {
-			div[0].append(`In ${year}, you completed ${count} study and earned £${pay}`);
+			div[0].append(`In ${year}, you completed ${count} study and earned £${total}, , of which £${bonus} was bonus payment.`);
 		} else {
-			div[0].append(`In ${year}, you completed ${count} studies and earned £${pay}`);
+			div[0].append(`In ${year}, you completed ${count} studies and earned £${total}, of which £${bonus} was bonus payment.`);
 		}
 	} else if (full && !month && !year) {
 		if (count == 1) {
-			div[0].append(`In total, you completed ${count} study and earned £${pay}`);
+			div[0].append(`In total, you completed ${count} study and earned £${total}, of which £${bonus} was bonus payment.`);
 		} else {
-			div[0].append(`In total, you completed ${count} studies and earned £${pay}`);
+			div[0].append(`In total, you completed ${count} studies and earned £${total}, of which £${bonus} was bonus payment.`);
 		}
 	}
 
-	// TODO possibly add bonus to the total amount earned for the period, would be easy just add container[2] when you add container[1] to pay
+	// TODO add bonus to the total amount earned for the period, would have to add container[2] as another index in each month array
+	// would have to change the starting index of 2 to 3, and unshift and shift a third time in the sorting algo
 }
 
 function check() {
